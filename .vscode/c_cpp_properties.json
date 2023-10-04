@@ -1,0 +1,68 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "C:/Users/sfalk/Rolec_OpenEVSE/open_evse_rolec/include",
+                "C:/Users/sfalk/Rolec_OpenEVSE/open_evse_rolec/firmware/open_evse",
+                "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/variants/standard",
+                "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "C:/Users/sfalk/Rolec_OpenEVSE/open_evse_rolec/include",
+                    "C:/Users/sfalk/Rolec_OpenEVSE/open_evse_rolec/firmware/open_evse",
+                    "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/cores/arduino",
+                    "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/variants/standard",
+                    "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
+                    "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                    "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                    "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src",
+                    "C:/Users/sfalk/.platformio/packages/framework-arduino-avr/libraries/Wire/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60111",
+                "ARDUINO_ARCH_AVR",
+                "AVR_OPENEVSE",
+                "F_CPU=16000000L",
+                "ARDUINO_ARCH_AVR",
+                "ARDUINO=10808",
+                "OEV6",
+                "RELAY_PWM",
+                "SHOW_DISABLED_TESTS",
+                "AMMETER",
+                "RAPI",
+                "RAPI_SERIAL",
+                "RAPI_WF",
+                "RAPI_BTN",
+                "MENNEKES_LOCK",
+                "BOOTLOCK",
+                "AUTOSVCLEVEL",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "compilerPath": "C:/Users/sfalk/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
