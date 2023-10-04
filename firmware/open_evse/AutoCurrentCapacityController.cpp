@@ -13,15 +13,30 @@
 // it online at <http://www.gnu.org/licenses/>.
 
 #include "open_evse.h"
+int cntr = 0; // loop counter
 
 #ifdef PP_AUTO_AMPACITY
 
+/*
+// This is the table for OpenEVSE
 static PP_AMPS s_ppAmps[] = {
   {0,0},
   {93,63},  // 100 = 93
   {185,32}, // 220 = 185
   {415,20}, // 680 = 415
   {615,13}, // 1.5K = 615
+  {1023,0}
+};
+*/
+
+// This is the empirical table for Rolec
+// ADC = 0.0823R + 3.1279
+static PP_AMPS s_ppAmps[] = {
+  {0,0},
+  {11,63},  // 100 = 11
+  {18,32}, // 220 = 18
+  {60,20}, // 680 = 60
+  {126,13}, // 1.5K = 126
   {1023,0}
 };
 
@@ -32,8 +47,12 @@ AutoCurrentCapacityController::AutoCurrentCapacityController() :
 
 uint8_t AutoCurrentCapacityController::ReadPPMaxAmps()
 {
-  // n.b. should probably sample a few times and average it
-  uint16_t adcval = adcPP.read();
+  // n.b. sample a few times and average it
+  uint16_t adcval = 0;
+  for (cntr=0; cntr<10; cntr++ ) {
+    adcval = adcval + adcPP.read();
+    }
+  adcval = (adcval/10);
 
   uint8_t amps = 0;
   for (uint8_t i=1;i < sizeof(s_ppAmps)/sizeof(s_ppAmps[0]);i++) {
@@ -43,7 +62,9 @@ uint8_t AutoCurrentCapacityController::ReadPPMaxAmps()
     }
   }
 
-  //  Serial.print("pp: ");Serial.print(adcval);Serial.print(" amps: ");Serial.println(amps);
+#ifdef SERDBG
+    Serial.print("pp: ");Serial.print(adcval);Serial.print(" amps: ");Serial.println(amps);
+#endif //SERDBG
 
   return amps;
 }
