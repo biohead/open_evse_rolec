@@ -903,6 +903,7 @@ uint8_t J1772EVSEController::doPost()
     g_OBD.LcdSetBacklightColor(RED);
 #endif // LCD16X2
     g_OBD.SetGreenLed(0);
+    g_OBD.SetBlueLed(0);
     g_OBD.SetRedLed(1);
   }
   else {
@@ -2028,13 +2029,25 @@ void J1772EVSEController::Calibrate(PCALIB_DATA pcd)
 
 int J1772EVSEController::SetCurrentCapacity(uint8_t amps,uint8_t updatelcd,uint8_t nosave)
 {
+#ifdef SERDBG
+  Serial.print("Value passed to SetCurrentCapacity is: ");
+  Serial.println(amps);
+#endif //SERDBG 
   int rc = 0;
   uint8_t maxcurrentcap = (GetCurSvcLevel() == 1) ? MAX_CURRENT_CAPACITY_L1 : m_MaxHwCurrentCapacity;
+#ifdef SERDBG
+  Serial.print("Value set by service level is: ");
+  Serial.println(maxcurrentcap);
+#endif //SERDBG
 
   if (nosave) {
     // temporary amps can't be > max set in EEPROM
     maxcurrentcap = GetMaxCurrentCapacity();
   }
+#ifdef SERDBG
+  Serial.print("Max value from EEPROM makes it: ");
+  Serial.println(maxcurrentcap);
+#endif //SERDBG
 
 #ifdef PP_AUTO_AMPACITY
   if ((GetState() >= EVSE_STATE_B) && (GetState() <= EVSE_STATE_C)) {
@@ -2043,6 +2056,10 @@ int J1772EVSEController::SetCurrentCapacity(uint8_t amps,uint8_t updatelcd,uint8
       maxcurrentcap = mcc;
     }
   }
+#ifdef SERDBG
+  Serial.print("Max value after cable check is: ");
+  Serial.println(maxcurrentcap);
+#endif //SERDBG
 #endif // PP_AUTO_AMPACITY
 
   if ((amps >= MIN_CURRENT_CAPACITY_J1772) && (amps <= maxcurrentcap)) {
@@ -2056,6 +2073,10 @@ int J1772EVSEController::SetCurrentCapacity(uint8_t amps,uint8_t updatelcd,uint8
     m_CurrentCapacity = maxcurrentcap;
     rc = 2;
   }
+#ifdef SERDBG
+  Serial.print("Value after checking min value: ");
+  Serial.println(m_CurrentCapacity);
+#endif //SERDBG
 
   if (!nosave) {
 	#ifdef DEBUG_HS

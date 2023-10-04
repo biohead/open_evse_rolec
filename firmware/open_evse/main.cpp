@@ -1,6 +1,6 @@
 // -*- C++ -*-
 /*
- * Open EVSE Firmware
+ * Open EVSE Firmware for Rolec ACSE 0020
  *
  * Copyright (c) 2011-2023 Sam C. Lin
  * Copyright (c) 2011-2014 Chris Howell <chris1howell@msn.com>
@@ -9,6 +9,7 @@
  * portions Copyright (c) 2015 Craig Kirkpatrick
  * portions Copyright (c) 2015 William McBrine
  * portions Copyright (c) 2019 Tim Kuechler BowElectric at gmail
+ * portions Copyright (c) 2020 Barny Daley (Rolec Alterations)
 
  Revised  Ver	By		Reason
  6/21/13  20b3	Scott Rubin	fixed LCD display bugs with RTC enabled
@@ -23,7 +24,8 @@
  3/1/15        Craig K         add TEMPERATURE_MONITORING
  3/7/15        Craig K         add KWH_RECORDING
  10/28/2019    Tim Kuechler    add HEARTBEAT_SUPERVISION
-  
+ 21/11/20      BarnyD          make alterations to run on Rolec ACSE0020 hardware (3 x LEDs, no ammeter, no temperature montioring) 
+
  * This file is part of Open EVSE.
 
  * Open EVSE is free software; you can redistribute it and/or modify
@@ -410,6 +412,10 @@ void OnboardDisplay::Init()
   pinRedLed.init(RED_LED_REG,RED_LED_IDX,DigitalPin::OUT);
   SetRedLed(0);
 #endif
+#ifdef BLUE_LED_REG
+  pinBlueLed.init(BLUE_LED_REG,BLUE_LED_IDX,DigitalPin::OUT);
+  SetBlueLed(0);
+#endif
 
 #ifdef LCD16X2
   LcdBegin(LCD_MAX_CHARS_PER_LINE, 2);
@@ -531,6 +537,7 @@ void OnboardDisplay::Update(int8_t updmode)
     case EVSE_STATE_A: // not connected
       SetGreenLed(1);
       SetRedLed(0);
+      SetBlueLed(0);
 #ifdef LCD16X2
       // Display Timer and Stop Icon - GoldServe
       LcdClear();
@@ -561,11 +568,11 @@ void OnboardDisplay::Update(int8_t updmode)
 #endif // KWH_RECORDING
       
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is off
       break;
     case EVSE_STATE_B: // connected/not charging
       SetGreenLed(1);
-      SetRedLed(1);
+      SetBlueLed(0);
+      SetRedLed(0);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdClear();
       LcdSetCursor(0,0);
@@ -606,10 +613,10 @@ void OnboardDisplay::Update(int8_t updmode)
 #endif // KWH_RECORDING
       
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is off
       break;
     case EVSE_STATE_C: // charging
       SetGreenLed(0);
+      SetBlueLed(1);
       SetRedLed(0);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(TEAL);
@@ -631,31 +638,31 @@ void OnboardDisplay::Update(int8_t updmode)
 #endif //#ifdef DELAYTIMER
       LcdPrint_P(g_psCharging);
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is on
 #ifdef AMMETER
       SetAmmeterDirty(1); // force ammeter update code below
 #endif // AMMETER
       break;
     case EVSE_STATE_D: // vent required
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(RED);
       LcdMsg_P(g_psEvseError,g_psVentReq);
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is off
       break;
     case EVSE_STATE_DIODE_CHK_FAILED:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(RED);
       LcdMsg_P(g_psEvseError,g_psDiodeChkFailed);
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is off
       break;
     case EVSE_STATE_GFCI_FAULT:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(RED);
@@ -667,11 +674,11 @@ void OnboardDisplay::Update(int8_t updmode)
         LcdPrint_P(0,g_psGfciFault);
       }
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is off
       break;
 #ifdef TEMPERATURE_MONITORING      
     case EVSE_STATE_OVER_TEMPERATURE:    // overtemp message in Red on the RGB LCD
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(RED);
@@ -682,6 +689,7 @@ void OnboardDisplay::Update(int8_t updmode)
 #ifdef OVERCURRENT_THRESHOLD
     case EVSE_STATE_OVER_CURRENT:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(RED);
@@ -694,6 +702,7 @@ void OnboardDisplay::Update(int8_t updmode)
 #endif // OVERCURRENT_THRESHOLD   
     case EVSE_STATE_NO_GROUND:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(RED);
@@ -705,28 +714,28 @@ void OnboardDisplay::Update(int8_t updmode)
         LcdPrint_P(0,g_psNoGround);
       }
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is off
       break;
     case EVSE_STATE_STUCK_RELAY:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(RED);
       LcdMsg_P(updmode == OBD_UPD_HARDFAULT ? g_psSvcReq : g_psEvseError,g_psStuckRelay);
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is off
       break;
     case EVSE_STATE_RELAY_CLOSURE_FAULT:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2 //Adafruit RGB LCD
       LcdSetBacklightColor(RED);
       LcdMsg_P(g_psSvcReq,g_psRelayClosureFault);
 #endif //Adafruit RGB LCD
-      // n.b. blue LED is off
       break;
     case EVSE_STATE_DISABLED:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2
       LcdSetBacklightColor(VIOLET);
@@ -744,6 +753,7 @@ void OnboardDisplay::Update(int8_t updmode)
 #ifdef GFI_SELFTEST
     case EVSE_STATE_GFI_TEST_FAILED:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2
       LcdSetBacklightColor(RED);
@@ -753,7 +763,8 @@ void OnboardDisplay::Update(int8_t updmode)
 #endif // GFI_SELFTEST
     case EVSE_STATE_SLEEPING:
       SetGreenLed(1);
-      SetRedLed(1);
+      SetBlueLed(0);
+      SetRedLed(0);
 #ifdef LCD16X2
       LcdSetBacklightColor(g_EvseController.EvConnected() ? WHITE : VIOLET);
       LcdClear();
@@ -769,8 +780,8 @@ void OnboardDisplay::Update(int8_t updmode)
       break;
     default:
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
-      // n.b. blue LED is off
     }
 #ifdef TEMPERATURE_MONITORING
     if ((g_TempMonitor.OverTemperature() || g_TempMonitor.OverTemperatureLogged()) && !g_EvseController.InHardFault()) {
@@ -778,6 +789,7 @@ void OnboardDisplay::Update(int8_t updmode)
       LcdSetBacklightColor(RED);
 #endif
       SetGreenLed(0);
+      SetBlueLed(0);
       SetRedLed(1);
 #ifdef LCD16X2
       LcdPrint_P(0,g_psHighTemp);
@@ -2478,6 +2490,7 @@ void setup()
   delay(400);  // give I2C devices time to be ready before running code that wants to initialize I2C devices.  Otherwise a hang can occur upon powerup.
   
   Serial.begin(SERIAL_BAUD);
+  Serial.println("Starting");
 
 #ifdef BTN_MENU
   g_BtnHandler.init();

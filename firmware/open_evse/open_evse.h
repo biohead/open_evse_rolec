@@ -170,18 +170,18 @@ extern AutoCurrentCapacityController g_ACCController;
 #endif // OPENEVSE_2
 
 // GFI support
-#define GFI
+//#define GFI
 
 // If you loop a wire from the third GFI pin through the CT a few times and then to ground,
 // enable this. ADVPWR must also be defined.
-#define GFI_SELFTEST
+//#define GFI_SELFTEST
 
 // behavior specified by UL
 // 1) if enabled, POST failure will cause a hard fault until power cycled.
 //    disabled, will retry POST continuously until it passes
 // 2) if enabled, any a fault occurs immediately after charge is initiated,
 //    hard fault until power cycled. Otherwise, do the standard delay/retry sequence
-#define UL_COMPLIANT
+//#define UL_COMPLIANT
 
 #ifdef UL_COMPLIANT
 #define ADVPWR
@@ -191,7 +191,7 @@ extern AutoCurrentCapacityController g_ACCController;
 #define GFI_SELFTEST
 #endif //UL_COMPLIANT
 
-#define TEMPERATURE_MONITORING  // Temperature monitoring support
+//#define TEMPERATURE_MONITORING  // Temperature monitoring support
 
 #define HEARTBEAT_SUPERVISION // Heartbeat Supervision support
 
@@ -210,7 +210,7 @@ extern AutoCurrentCapacityController g_ACCController;
 #define MV_FOR_L1 120000L       // conventional for North America
 #endif
 #ifndef MV_FOR_L2
-#define MV_FOR_L2 240000L       // conventional for North America
+#define MV_FOR_L2 240000L       // conventional for North America & nominal UK real-world
 //  #define MV_FOR_L2 230000L   // conventional for most of the world
 #endif
 
@@ -230,12 +230,12 @@ extern AutoCurrentCapacityController g_ACCController;
 #endif //AMMETER
 
 //Adafruit RGBLCD (MCP23017) - can have RGB or monochrome backlight
-#define RGBLCD
+//#define RGBLCD
 
 //select default LCD backlight mode. can be overridden w/CLI/RAPI
-#define BKL_TYPE_MONO 0
-#define BKL_TYPE_RGB  1
-#define DEFAULT_LCD_BKL_TYPE BKL_TYPE_RGB
+//#define BKL_TYPE_MONO 0
+//#define BKL_TYPE_RGB  1
+//#define DEFAULT_LCD_BKL_TYPE BKL_TYPE_RGB
 //#define DEFAULT_LCD_BKL_TYPE BKL_TYPE_MONO
 
 // Adafruit LCD backpack in I2C mode (MCP23008)
@@ -251,7 +251,7 @@ extern AutoCurrentCapacityController g_ACCController;
 #endif // I2CLCD_PCF8574
 
 // Advanced Powersupply... Ground check, stuck relay, L1/L2 detection.
-#define ADVPWR
+//#define ADVPWR
 
 // single button menus (needs LCD enabled)
 // connect an SPST-NO button between pin defined by BTN_REG/BTN_IDX and GND or enable ADAFRUIT_BTN to use the
@@ -259,7 +259,7 @@ extern AutoCurrentCapacityController g_ACCController;
 // How to use 1-button menu
 // Long press activates menu
 // When within menus, short press cycles menu items, long press selects and exits current submenu
-#define BTN_MENU
+//#define BTN_MENU
 
 // take out basic setup stuff that the user really shouldn't be changing,
 // which can be set via RAPI/WiFi module.. reclaims a lot of code space
@@ -267,7 +267,7 @@ extern AutoCurrentCapacityController g_ACCController;
 
 // When not in menus, short press instantly stops the EVSE - another short press resumes.  Long press activates menus
 // also allows menus to be manipulated even when in State B/C
-#define BTN_ENABLE_TOGGLE
+//#define BTN_ENABLE_TOGGLE
 
 #ifdef BTN_MENU
 // use Adafruit RGB LCD select button
@@ -278,7 +278,7 @@ extern AutoCurrentCapacityController g_ACCController;
 
 // Option for RTC and DelayTime
 // REQUIRES HARDWARE RTC: DS1307 or DS3231 connected via I2C
-#define RTC // enable RTC & timer functions
+//#define RTC // enable RTC & timer functions
 
 #ifdef RTC
 // Option for Delay Timer - GoldServe
@@ -356,7 +356,7 @@ extern AutoCurrentCapacityController g_ACCController;
 #endif
 
 #if defined(RGBLCD) || defined(I2CLCD)
-#define LCD16X2
+//#define LCD16X2
 //If LCD is not defined, undef BTN_MENU - requires LCD
 #else
 #undef BTN_MENU
@@ -442,7 +442,7 @@ extern AutoCurrentCapacityController g_ACCController;
 #define DEFAULT_CURRENT_CAPACITY_L1 12
 #endif
 #ifndef DEFAULT_CURRENT_CAPACITY_L2
-#define DEFAULT_CURRENT_CAPACITY_L2 24
+#define DEFAULT_CURRENT_CAPACITY_L2 32
 #endif
 
 // minimum allowable current in amps
@@ -455,14 +455,14 @@ extern AutoCurrentCapacityController g_ACCController;
 #define MAX_CURRENT_CAPACITY_L1 24 // J1772 Max for L1 on a 20A circuit = 16, 15A circuit = 12 Some Vehicles suppoty 24A on 30A RV outlet TT-30
 #endif
 #ifndef MAX_CURRENT_CAPACITY_L2
-#define MAX_CURRENT_CAPACITY_L2 80 // J1772 Max for L2 = 80
+#define MAX_CURRENT_CAPACITY_L2 32 // J1772 Max for L2 = 80
 #endif
 
 //J1772EVSEController
 
-#define CURRENT_PIN 0 // analog current reading pin ADCx
-#define PILOT_PIN 1 // analog pilot voltage reading pin ADCx
-#define PP_PIN 2 // PP_READ - ADC2
+#define CURRENT_PIN 4 // analog current reading pin ADCx - Not used on Rolec so select unused pin
+#define PILOT_PIN 1 // analog pilot voltage reading pin ADCx - Rolec CP = ADC1
+#define PP_PIN 0 // PP_READ - ADC0 for Rolec
 #ifdef VOLTMETER
 // N.B. Note, ADC2 is already used as PP_PIN so beware of potential clashes
 // voltmeter pin is ADC2 on OPENEVSE_2
@@ -481,8 +481,8 @@ extern AutoCurrentCapacityController g_ACCController;
 #else // !OPENEVSE_2
 
  // TEST PIN 1 for L1/L2, ground and stuck relay
-#define ACLINE1_REG &PIND
-#define ACLINE1_IDX 3
+#define ACLINE1_REG &PINC // Rolec Voltage Detection is on D18 (Port C, Pin 4)
+#define ACLINE1_IDX 4
  // TEST PIN 2 for L1/L2, ground and stuck relay
 #define ACLINE2_REG &PIND
 #define ACLINE2_IDX 4
@@ -491,26 +491,27 @@ extern AutoCurrentCapacityController g_ACCController;
 #define V6_CHARGING_PIN2 6
 
 // digital Relay trigger pin
-#define CHARGING_REG &PINB
-#define CHARGING_IDX 0
+#define CHARGING_REG &PINC // Rolec RL1 is on C2
+#define CHARGING_IDX 2
 // digital Relay trigger pin for second relay
 #define CHARGING2_REG &PIND
 #define CHARGING2_IDX 7
 //digital Charging pin for AC relay
-#define CHARGINGAC_REG &PINB
-#define CHARGINGAC_IDX 1
+#define CHARGINGAC_REG &PIND // Rolec RL2 is on D5
+#define CHARGINGAC_IDX 5
 
-// obsolete LED pin
-//#define RED_LED_REG &PIND
-//#define RED_LED_IDX 5
-// obsolete LED pin
-//#define GREEN_LED_REG &PINB
-//#define GREEN_LED_IDX 5
+// Rolec LED pins
+#define RED_LED_REG &PINB // Rolec Red LED is on Digital 8
+#define RED_LED_IDX 0
+#define GREEN_LED_REG &PIND // Rolec Green LED is on Digital 7
+#define GREEN_LED_IDX 7
+#define BLUE_LED_REG &PINC // Rolec Blue LED is on Digital 17
+#define BLUE_LED_IDX 3
 #endif // OPENEVSE_2
 
 // N.B. if PAFC_PWM is enabled, then pilot pin can be PB1 or PB2
 // if using fast PWM (PAFC_PWM disabled) pilot pin *MUST* be PB2
-#define PILOT_REG &PINB
+#define PILOT_REG &PINB // Rolec Pin B2 - Digital 10
 #define PILOT_IDX 2
 
 #ifdef MENNEKES_LOCK
@@ -853,6 +854,9 @@ class OnboardDisplay
 #ifdef GREEN_LED_REG
   DigitalPin pinGreenLed;
 #endif
+#ifdef BLUE_LED_REG
+  DigitalPin pinBlueLed;
+#endif
 #if defined(RGBLCD) || defined(I2CLCD)
 #ifdef I2CLCD_PCF8574
   LiquidCrystal_I2C m_Lcd;
@@ -882,6 +886,13 @@ public:
   pinRedLed.write(state);
 #endif
   }
+
+    void SetBlueLed(uint8_t state) {
+#ifdef BLUE_LED_REG
+  pinBlueLed.write(state);
+#endif
+  }
+
 #ifdef LCD16X2
   void LcdBegin(int x,int y) {
 #ifdef I2CLCD
